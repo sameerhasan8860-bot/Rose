@@ -22,6 +22,7 @@ class GroupSettings(Base):
     rules: Mapped[str] = mapped_column(Text, default="No spam. Be respectful.")
     anti_spam: Mapped[bool] = mapped_column(Boolean, default=True)
     captcha: Mapped[bool] = mapped_column(Boolean, default=False)
+    anti_raid: Mapped[bool] = mapped_column(Boolean, default=False)
 
 class Warning(Base):
     __tablename__ = "warnings"
