@@ -6,6 +6,8 @@ from app.config import settings
 from app.database import init_db
 from app.handlers.common import router as common_router
 from app.handlers.moderation import router as moderation_router
+from app.handlers.group_tools import router as group_tools_router
+from app.handlers.anti_spam import router as anti_spam_router
 from app.services.groups import register_group
 
 async def on_chat_member(event: ChatMemberUpdated):
@@ -22,6 +24,8 @@ async def main():
     dp = Dispatcher()
     dp.include_router(common_router)
     dp.include_router(moderation_router)
+    dp.include_router(group_tools_router)
+    dp.include_router(anti_spam_router)
     dp.chat_member.register(on_chat_member)
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
