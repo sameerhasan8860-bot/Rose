@@ -1,15 +1,18 @@
 # MASTER X
 
-Free Telegram group management bot. This is the first development release; anti-spam, anti-raid, CAPTCHA, dashboard and advanced group settings are not implemented yet.
+Free, modular Telegram group management bot. This is an early development build, not yet a complete replacement for established moderation platforms.
 
-## Implemented foundation
+## Implemented
 - aiogram 3 polling bot: /start, /help, /id and /rules
-- Reply-based moderation commands: /warn, /mute, /unmute, /ban and /unban
+- Reply-based moderation: /warn, /mute, /unmute, /ban and /unban
 - Group-admin and bot-permission checks before moderation actions
-- Async SQLAlchemy models for groups, group settings, warnings and filters
+- Custom welcome text with {name} and {username} placeholders
+- Optional button-based join verification: /captcha on|off
+- Optional basic flood protection: /antispam on|off
+- Async SQLAlchemy models for groups, settings, warnings and filters
 - FastAPI health endpoint at /health
 - Environment-based configuration
-- GitHub Actions compile and pytest checks
+- GitHub Actions compile and pytest workflow
 
 ## Setup
 1. Create a Telegram bot with BotFather and copy its token.
@@ -19,6 +22,12 @@ Free Telegram group management bot. This is the first development release; anti-
 5. Run the bot: python -m app.bot
 6. Optional API: uvicorn app.api:app --host 0.0.0.0 --port 8000
 
-To moderate a member, reply to one of their messages with /warn, /mute, /unmute, /ban or /unban. Make the bot an administrator with the required Restrict Members permission.
+Add the bot to your group as an administrator. It needs Delete Messages and Restrict Members permissions for the relevant protection features. Enable CAPTCHA with /captcha on and flood protection with /antispam on. Reply to a member's message to use moderation commands.
 
-Never commit .env or share your bot token. GitHub Actions is for CI/tests, not reliable 24/7 hosting. This is an early development build, not a finished feature-complete bot.
+## Important limitations
+- CAPTCHA currently uses a one-button human confirmation; it is not an advanced challenge and has no automatic timeout/cleanup yet.
+- Flood protection is a basic in-memory per-process rate limit, not distributed or persistent.
+- Anti-raid, link filtering, full analytics, AI moderation, dashboard, and global/group owner control are still planned.
+- GitHub Actions runs CI/tests; it is not guaranteed 24/7 bot hosting.
+
+Never commit .env or share your bot token.
