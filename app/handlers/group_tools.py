@@ -1,3 +1,4 @@
+from html import escape
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.types import Message, ChatPermissions, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
@@ -59,7 +60,7 @@ async def change_group_setting(callback: CallbackQuery):
         command = "/setwelcome [text]" if action == "welcome" else "/setrules [text]"
         await callback.answer()
         await callback.message.answer(
-            f"📝 <b>{label}</b>\n{value}\n\nChange it with {command}.", parse_mode="HTML"
+            f"📝 <b>{label}</b>\n{escape(value)}\n\nChange it with {command}.", parse_mode="HTML"
         )
     elif action == "refresh":
         await callback.answer("Settings refreshed.")
