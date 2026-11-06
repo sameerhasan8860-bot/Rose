@@ -1,3 +1,4 @@
+from html import escape
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
@@ -47,7 +48,7 @@ async def show_id(message: Message):
 async def rules(message: Message):
     from app.services.group_settings import get_settings
     current = await get_settings(message.chat.id)
-    await message.answer(f"📜 <b>Group rules</b>\n{current.rules}", parse_mode="HTML")
+    await message.answer(f"📜 <b>Group rules</b>\n{escape(current.rules)}", parse_mode="HTML")
 
 @router.callback_query(F.data.startswith("mxmenu:"))
 async def menu_navigation(callback: CallbackQuery):
