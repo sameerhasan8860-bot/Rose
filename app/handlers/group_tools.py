@@ -1,3 +1,4 @@
+import asyncio
 import secrets
 import time
 from html import escape
@@ -50,20 +51,45 @@ async def issue_math_captcha(message: Message, member):
             choices.add(candidate)
     ordered = list(choices)
     secrets.SystemRandom().shuffle(ordered)
-    _pending_captchas[(message.chat.id, member.id)] = (answer, time.monotonic() + _CAPTCHA_TTL)
+    expires_at = time.monotonic() + _CAPTCHA_TTL
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
             text=str(option),
             callback_data=f"mxc:{message.chat.id}:{member.id}:{option}"
         ) for option in ordered]
     ])
-    await message.answer(
+    sent = await message.answer(
         f"🔐 <b>Verification required</b>\n"
         f"{escape(member.full_name)}, solve this to chat:\n"
         f"<b>{left} + {right} = ?</b>\n"
         f"You have 3 minutes. Only your account can answer.",
         reply_markup=keyboard, parse_mode="HTML"
     )
+    _pending_captchas[(message.chat.id, member.id)] = (answer, expires_at, sent.message_id)
+    asyncio.create_task(_expire_captcha_later(
+        message.bot, message.chat.id, member.id, expires_at, sent.message_id
+    ))
+
+
+def _pop_expired_captcha(chat_id: int, user_id: int, now=None) -> bool:
+    pending = _pending_captchas.get((chat_id, user_id))
+    if pending and pending[1] <= (time.monotonic() if now is None else now):
+        _pending_captchas.pop((chat_id, user_id), None)
+        return True
+    return False
+
+
+async def _expire_captcha_later(bot, chat_id: int, user_id: int, expires_at: float, message_id: int):
+    await asyncio.sleep(max(0, expires_at - time.monotonic()))
+    pending = _pending_captchas.get((chat_id, user_id))
+    if pending and pending[1] == expires_at and _pop_expired_captcha(chat_id, user_id):
+        try:
+            await bot.edit_message_text(
+                chat_id=chat_id, message_id=message_id,
+                text="⌛ Verification expired. A group admin can use /captcharelease to review this member."
+            )
+        except Exception:
+            pass
 
 
 @router.message(Command("settings"))
@@ -181,6 +207,38 @@ async def antiraid_toggle(message: Message):
     await toggle_setting_command(message, "anti_raid", "Anti-raid")
 
 
+@router.message(Command("captcharelease"))
+async def release_expired_captcha(message: Message):
+    if not message.from_user or message.chat.type not in ("group", "supergroup"):
+        await message.reply("Use this command inside the group.")
+        return
+    if not await is_group_admin(message.bot, message.chat.id, message.from_user.id):
+        await message.reply("Only this group's admins can release a member.")
+        return
+    raw_user_id = (message.text or "").partition(" ")[2].strip()
+    try:
+        user_id = int(raw_user_id)
+    except ValueError:
+        await message.reply("Usage: /captcharelease USER_ID")
+        return
+
+    pending = _pending_captchas.get((message.chat.id, user_id))
+    if not pending:
+        await message.reply("No pending CAPTCHA was found for that user in this group.")
+        return
+    if _pop_expired_captcha(message.chat.id, user_id):
+        await message.reply("That CAPTCHA has expired. The member is still restricted; issue a fresh verification or review them manually.")
+        return
+    try:
+        await message.bot.restrict_chat_member(
+            message.chat.id, user_id, permissions=allowed_member_permissions()
+        )
+        _pending_captchas.pop((message.chat.id, user_id), None)
+        await message.reply(f"✅ CAPTCHA restriction released for user ID {user_id}.")
+    except Exception:
+        await message.reply("I couldn't release this member. Check that I have the Restrict Members admin permission.")
+
+
 @router.message(F.new_chat_members)
 async def welcome_new_members(message: Message):
     current = await get_settings(message.chat.id)
@@ -221,9 +279,8 @@ async def verify_math_captcha(callback: CallbackQuery):
         await callback.answer("This challenge belongs to another member.", show_alert=True)
         return
     pending = _pending_captchas.get((chat_id, user_id))
-    if not pending or pending[1] < time.monotonic():
-        _pending_captchas.pop((chat_id, user_id), None)
-        await callback.answer("Challenge expired. Ask an admin to let you retry.", show_alert=True)
+    if not pending or _pop_expired_captcha(chat_id, user_id):
+        await callback.answer("Challenge expired. Ask a group admin for help.", show_alert=True)
         return
     if choice != pending[0]:
         await callback.answer("Not quite. Try again.", show_alert=True)
