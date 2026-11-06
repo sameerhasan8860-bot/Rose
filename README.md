@@ -1,21 +1,22 @@
 # MASTER X
 
-A free, modular Telegram group management bot.
+Free Telegram group management bot. This repository currently contains the initial working foundation; advanced moderation and dashboard modules are planned, not yet complete.
 
-## Planned features
-- Group moderation: warn, mute, ban, kick, purge, locks, filters and notes
-- Anti-spam, anti-raid and CAPTCHA verification
-- Welcome and goodbye messages
-- Group rules, admin roles and audit logs
-- Analytics and optional AI-assisted moderation
-- Web dashboard
-
-## Planned stack
-- Python 3.12, aiogram 3 and FastAPI
-- SQLAlchemy async
-- SQLite for local development; PostgreSQL for production
+## Current foundation
+- aiogram 3 polling bot with /start, /help, /id and /rules
+- Async SQLAlchemy models for groups, settings, warnings and filters
+- FastAPI health endpoint at /health
+- Environment-based configuration
+- GitHub Actions compile and pytest checks
 
 ## Setup
-Copy `.env.example` to `.env` and configure your bot token and owner settings. Never commit secrets.
+1. Create a Telegram bot with BotFather and copy its token.
+2. Copy .env.example to .env.
+3. Set BOT_TOKEN and GLOBAL_OWNER_ID in .env.
+4. Install dependencies: pip install -r requirements.txt
+5. Run the bot: python -m app.bot
+6. Optional API: uvicorn app.api:app --host 0.0.0.0 --port 8000
 
-GitHub Actions is used for CI and tests; it is not guaranteed 24/7 hosting.
+Never commit .env or share your bot token. Add the bot to each group as an administrator and grant only the permissions it needs.
+
+GitHub Actions is for CI/tests, not reliable 24/7 hosting. This is an early scaffold, not a finished feature-complete bot.
