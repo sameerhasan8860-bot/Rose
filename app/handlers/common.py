@@ -11,18 +11,16 @@ async def start(message: Message):
 @router.message(Command("help"))
 async def help_command(message: Message):
     await message.answer(
-        "MASTER X commands:\n"
-        "/start - bot status\n"
-        "/help - this command list\n"
-        "/id - show chat and user IDs\n"
-        "/rules - show basic group rules\n\n"
-        "Reply to a member's message to use:\n"
-        "/warn [reason] - record a warning\n"
-        "/mute - restrict messages\n"
-        "/unmute - restore messaging\n"
-        "/ban - ban member\n"
-        "/unban - remove ban\n\n"
-        "Moderation commands require group-admin rights and bot permissions."
+        "MASTER X — Group Management\n\n"
+        "General:\n/start - bot status\n/help - command list\n/id - show IDs\n/rules - basic rules\n\n"
+        "Moderation (reply to a member):\n"
+        "/warn [reason] - record warning\n/mute - mute member\n/unmute - unmute member\n"
+        "/ban - ban member\n/unban - remove ban\n\n"
+        "Group admin settings:\n"
+        "/setwelcome <text> - set welcome message; placeholders: {name}, {username}\n"
+        "/captcha on|off - toggle join verification\n"
+        "/antispam on|off - toggle basic flood protection\n\n"
+        "Moderation requires admin rights and appropriate bot permissions."
     )
 
 @router.message(Command("id"))
