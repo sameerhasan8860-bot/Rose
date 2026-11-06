@@ -6,7 +6,10 @@ Free, modular Telegram group management bot. This is an early development build,
 - aiogram 3 polling bot: /start, /help, /id and /rules
 - Reply-based moderation: /warn, /mute, /unmute, /ban and /unban
 - Group-admin and bot-permission checks before moderation actions
+- Inline MASTER X main menu with help navigation
+- Admin-only per-group settings panel with CAPTCHA and anti-spam toggles
 - Custom welcome text with {name} and {username} placeholders
+- Custom group rules using /setrules
 - Optional button-based join verification: /captcha on|off
 - Optional basic flood protection: /antispam on|off
 - Async SQLAlchemy models for groups, settings, warnings and filters
@@ -22,7 +25,7 @@ Free, modular Telegram group management bot. This is an early development build,
 5. Run the bot: python -m app.bot
 6. Optional API: uvicorn app.api:app --host 0.0.0.0 --port 8000
 
-Add the bot to your group as an administrator. It needs Delete Messages and Restrict Members permissions for the relevant protection features. Enable CAPTCHA with /captcha on and flood protection with /antispam on. Reply to a member's message to use moderation commands.
+Add the bot to your group as an administrator. It needs Delete Messages and Restrict Members permissions for the relevant protection features. Open the admin panel with /settings, or enable CAPTCHA with /captcha on and flood protection with /antispam on. Set group rules with /setrules [text]. Reply to a member's message to use moderation commands.
 
 ## Important limitations
 - CAPTCHA currently uses a one-button human confirmation; it is not an advanced challenge and has no automatic timeout/cleanup yet.
