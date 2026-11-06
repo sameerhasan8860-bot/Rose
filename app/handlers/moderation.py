@@ -1,7 +1,6 @@
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message, ChatPermissions
-from sqlalchemy import select
 from app.database import SessionLocal
 from app.models import Warning
 from app.services.permissions import can_restrict
@@ -25,10 +24,6 @@ async def warn_user(message: Message):
         session.add(Warning(chat_id=message.chat.id, user_id=target.id,
                             admin_id=message.from_user.id, reason=reason))
         await session.commit()
-        count = await session.scalar(
-            select(Warning).where(Warning.chat_id == message.chat.id,
-                                  Warning.user_id == target.id)
-        )
     await message.reply(f"⚠️ Warning recorded for {target.full_name}. Reason: {reason}")
 
 @router.message(Command("mute"))
