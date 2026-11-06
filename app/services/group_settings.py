@@ -20,7 +20,7 @@ async def get_settings(chat_id: int) -> GroupSettings:
         return settings
 
 async def update_setting(chat_id: int, field: str, value):
-    if field not in {"welcome_text", "anti_spam", "captcha", "rules"}:
+    if field not in {"welcome_text", "anti_spam", "captcha", "anti_raid", "rules"}:
         raise ValueError("Unsupported group setting")
     async with SessionLocal() as session:
         group = await session.scalar(select(Group).where(Group.telegram_id == chat_id))
