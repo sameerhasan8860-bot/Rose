@@ -86,7 +86,7 @@ async def _expire_captcha_later(bot, chat_id: int, user_id: int, expires_at: flo
         try:
             await bot.edit_message_text(
                 chat_id=chat_id, message_id=message_id,
-                text="⌛ Verification expired. A group admin can use /captcharelease to review this member."
+                text="⌛ Verification expired. A group admin can use /captcharelease USER_ID to restore access after review."
             )
         except Exception:
             pass
