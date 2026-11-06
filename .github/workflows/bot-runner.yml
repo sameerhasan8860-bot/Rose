@@ -16,8 +16,8 @@ jobs:
     timeout-minutes: 350
     env:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      GLOBAL_OWNER_ID: ${{ vars.GLOBAL_OWNER_ID }}
-      DATABASE_URL: ${{ vars.DATABASE_URL }}
+      GLOBAL_OWNER_ID: ${{ vars.GLOBAL_OWNER_ID || '0' }}
+      DATABASE_URL: ${{ vars.DATABASE_URL || 'sqlite+aiosqlite:///./master_x.db' }}
       LOG_LEVEL: INFO
     steps:
       - name: Checkout repository
