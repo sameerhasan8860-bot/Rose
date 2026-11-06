@@ -1,0 +1,42 @@
+name: MASTER X Bot Runner
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: master-x-bot-runner
+  cancel-in-progress: true
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      GLOBAL_OWNER_ID: ${{ vars.GLOBAL_OWNER_ID }}
+      DATABASE_URL: ${{ vars.DATABASE_URL }}
+      LOG_LEVEL: INFO
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Check bot token
+        run: |
+          if [ -z "$BOT_TOKEN" ]; then
+            echo "::error::BOT_TOKEN secret is missing. Add it in Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Start MASTER X
+        run: python -m app.bot
