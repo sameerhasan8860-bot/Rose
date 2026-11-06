@@ -222,13 +222,9 @@ async def release_expired_captcha(message: Message):
         await message.reply("Usage: /captcharelease USER_ID")
         return
 
-    pending = _pending_captchas.get((message.chat.id, user_id))
-    if not pending:
-        await message.reply("No pending CAPTCHA was found for that user in this group.")
-        return
-    if _pop_expired_captcha(message.chat.id, user_id):
-        await message.reply("That CAPTCHA has expired. The member is still restricted; issue a fresh verification or review them manually.")
-        return
+    # This is an explicit admin override: it can release a member whose CAPTCHA
+    # expired and whose temporary in-memory challenge has already been cleaned up.
+    _pending_captchas.pop((message.chat.id, user_id), None)
     try:
         await message.bot.restrict_chat_member(
             message.chat.id, user_id, permissions=allowed_member_permissions()
