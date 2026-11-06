@@ -4,7 +4,8 @@ from aiogram import Bot, Dispatcher
 from aiogram.types import ChatMemberUpdated
 from app.config import settings
 from app.database import init_db
-from app.handlers.common import router
+from app.handlers.common import router as common_router
+from app.handlers.moderation import router as moderation_router
 from app.services.groups import register_group
 
 async def on_chat_member(event: ChatMemberUpdated):
@@ -19,7 +20,8 @@ async def main():
     await init_db()
     bot = Bot(settings.bot_token)
     dp = Dispatcher()
-    dp.include_router(router)
+    dp.include_router(common_router)
+    dp.include_router(moderation_router)
     dp.chat_member.register(on_chat_member)
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
