@@ -35,7 +35,7 @@ async def help_command(message: Message):
         "/warn [reason] · /mute · /unmute · /ban · /unban\n\n"
         "<b>Group setup</b> (admins only)\n"
         "/setwelcome [text] · /setrules [text]\n"
-        "/captcha on|off · /antispam on|off",
+        "/captcha on|off · /antispam on|off · /antiraid on|off",
         reply_markup=help_menu(), parse_mode="HTML"
     )
 
@@ -70,7 +70,7 @@ async def menu_navigation(callback: CallbackQuery):
         await callback.message.edit_text(
             "📖 <b>MASTER X — Quick help</b>\n/settings — Group settings\n"
             "/setwelcome — Welcome text\n/setrules — Group rules\n"
-            "/captcha on|off — Join verification\n/antispam on|off — Flood protection\n"
+            "/captcha on|off — Join verification\n/antispam on|off — Flood protection\n/antiraid on|off — Join-burst protection\n"
             "/warn · /mute · /unmute · /ban · /unban",
             reply_markup=help_menu(), parse_mode="HTML"
         )
