@@ -12,13 +12,23 @@ async def start(message: Message):
 async def help_command(message: Message):
     await message.answer(
         "MASTER X commands:\n"
-        "/start - status\n/help - command list\n/id - show chat and user IDs\n"
-        "Group admins: /setwelcome <text>, /rules"
+        "/start - bot status\n"
+        "/help - this command list\n"
+        "/id - show chat and user IDs\n"
+        "/rules - show basic group rules\n\n"
+        "Reply to a member's message to use:\n"
+        "/warn [reason] - record a warning\n"
+        "/mute - restrict messages\n"
+        "/unmute - restore messaging\n"
+        "/ban - ban member\n"
+        "/unban - remove ban\n\n"
+        "Moderation commands require group-admin rights and bot permissions."
     )
 
 @router.message(Command("id"))
 async def show_id(message: Message):
-    await message.answer(f"Chat ID: {message.chat.id}\nYour ID: {message.from_user.id}")
+    user_id = message.from_user.id if message.from_user else "unknown"
+    await message.answer(f"Chat ID: {message.chat.id}\nYour ID: {user_id}")
 
 @router.message(Command("rules"))
 async def rules(message: Message):
